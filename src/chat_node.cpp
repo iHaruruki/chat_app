@@ -18,7 +18,7 @@ public:
 
   // 受信コールバック：自分の送信メッセージは無視し、受信時にプロンプトを再表示する
   void topic_callback(const std_msgs::msg::String::SharedPtr msg) {
-    std::string prefix = node_id_ + ": ";
+    std::string prefix = "[" + node_id_ + "]";
     if (msg->data.rfind(prefix, 0) == 0) {
       // 自分の送信したメッセージの場合は無視
       return;
@@ -31,7 +31,7 @@ public:
   // メッセージ送信関数：送信時にノードIDを付与
   void send_message(const std::string & message) {
     auto msg = std_msgs::msg::String();
-    msg.data = message + [node_id_];
+    msg.data = message;
     publisher_->publish(msg);
     RCLCPP_INFO(this->get_logger(), "Publish: %s", msg.data.c_str());
   }
