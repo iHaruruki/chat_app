@@ -13,7 +13,7 @@ public:
       "chat", 10,
       std::bind(&ChatNode::topic_callback, this, std::placeholders::_1)
     );
-    RCLCPP_INFO(this->get_logger(), "チャットノード [%s] が起動しました", node_id_.c_str());
+    RCLCPP_INFO(this->get_logger(), "chat_app [%s] started", node_id_.c_str());
   }
 
   // 受信コールバック：自分の送信メッセージは無視し、受信時にプロンプトを再表示する
@@ -23,17 +23,17 @@ public:
       // 自分の送信したメッセージの場合は無視
       return;
     }
-    RCLCPP_INFO(this->get_logger(), "受信: '%s'", msg->data.c_str());
+    RCLCPP_INFO(this->get_logger(), "Subscribe: %s", msg->data.c_str());
     // メッセージ受信後に入力プロンプトを再表示
-    std::cout << "メッセージを入力してください (終了するには 'exit' と入力): " << std::flush;
+    std::cout << "Enter your message (type 'exit' to exit): " << std::flush;
   }
 
   // メッセージ送信関数：送信時にノードIDを付与
   void send_message(const std::string & message) {
     auto msg = std_msgs::msg::String();
-    msg.data = node_id_ + ": " + message;
+    msg.data = message + [node_id_];
     publisher_->publish(msg);
-    RCLCPP_INFO(this->get_logger(), "送信: '%s'", msg.data.c_str());
+    RCLCPP_INFO(this->get_logger(), "Publish: %s", msg.data.c_str());
   }
 
 private:
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   // メインスレッドでユーザー入力を受付
   std::string input;
   while (rclcpp::ok()) {
-    std::cout << "メッセージを入力してください (終了するには 'exit' と入力): " << std::flush;
+    std::cout << "Enter your message (type 'exit' to exit): " << std::flush;
     std::getline(std::cin, input);
     if (input == "exit") {
       break;
